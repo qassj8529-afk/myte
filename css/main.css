@@ -197,61 +197,24 @@ p {
 
 textarea#script-input {
   width: 100%;
-  height: 180px;
+  height: 380px;
+  /* Much larger for JSON */
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 1rem;
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 1rem;
-  resize: none;
+  font-size: 0.9rem;
+  resize: vertical;
   outline: none;
   transition: border-color 0.2s;
+  white-space: pre;
 }
 
 textarea#script-input:focus {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 2px var(--accent-glow);
-}
-
-.api-panel {
-  text-align: left;
-}
-
-.api-panel label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.api-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.api-inputs input {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-family: inherit;
-  outline: none;
-}
-
-.api-inputs input:focus {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-#api-status {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #fbbf24;
 }
 
 button#btn-generate {
@@ -518,35 +481,97 @@ button#btn-generate:active {
   font-style: italic;
 }
 
-/* Expandable API Panel */
-.expandable-panel {
+/* ==========================================================================
+   Slide Content Grid Definitions
+   ========================================================================== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  height: 100%;
+}
+
+.overview-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.overview-ticker {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  line-height: 1;
+}
+
+.overview-name {
+  font-size: 2rem;
+  color: #fff;
+}
+
+.split-layout {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+}
+
+.split-col {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.col-bull {
+  border-top: 4px solid #4ade80;
+}
+
+.col-bear {
+  border-top: 4px solid #ef4444;
+}
+
+.col-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.bullet-list {
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.bullet-list li {
+  margin-bottom: 1rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.metric-card {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease-out;
 }
 
-.expandable-panel.open {
-  max-height: 500px;
-  /* arbitrary max height large enough to fit inputs */
-  margin-top: 0.5rem;
+.metric-card .label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
 }
 
-.toggle-btn {
-  background: none;
-  border: none;
-  color: var(--accent-color);
-  font-size: 0.8rem;
-  text-align: left;
-  cursor: pointer;
-  padding: 0.5rem 0;
-  margin-top: 0.2rem;
-  outline: none;
-  font-family: inherit;
-}
-
-.toggle-btn:hover {
-  text-decoration: underline;
+.metric-card .value {
+  font-size: 2rem;
+  color: #fff;
+  font-weight: 600;
 }

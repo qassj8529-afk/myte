@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>Finance Studio Pro - Modular</title>
+  <title>Finance Studio Pro - Pure JSON Renderer</title>
 
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,53 +21,23 @@
   <!-- Animated Gradient Background -->
   <div class="bg-gradient"></div>
 
-  <!-- FILE PROTOCOL WARNING BANNER -->
-  <div id="file-protocol-warning" class="hidden banner-error">
-    <strong>WARNING:</strong> Run this project via local server (Live Server or GitHub Pages) to enable API requests.
-  </div>
-
   <!-- SLIDER WRAPPER -->
   <div id="slider-wrapper">
     <!-- SLIDE 1: START SCREEN -->
     <div class="slide slide-active" id="slide-start">
-      <div class="glass-panel central-panel">
+      <div class="glass-panel central-panel" style="max-width: 800px;">
         <h1>Finance Studio Pro</h1>
-        <p class="subtitle">Blueprint-Driven Data Engine</p>
+        <p class="subtitle">Pure JSON Blueprint Renderer</p>
 
         <label
-          style="display:block; text-align:left; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase;">Dashboard
-          Blueprint (JSON)</label>
+          style="display:block; text-align:left; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; margin-top: 1rem;">Dashboard
+          JSON Input</label>
         <textarea id="script-input" placeholder='{
   "ticker": "AAPL",
-  "companyName": "Apple Inc.",
-  "dashboardPanelsRequired": ["chart", "key_metrics"]
+  "companyName": "Apple Inc."
 }'></textarea>
 
-        <div class="api-panel">
-          <label>API Configuration (Optional Providers)</label>
-          <div class="api-inputs" id="api-inputs">
-            <input type="text" id="api-polygon" placeholder="Polygon API Key" />
-            <div class="expandable-panel" id="expandable-api-panel">
-              <input type="text" id="api-alphavantage" placeholder="Alpha Vantage API Key" />
-              <input type="text" id="api-finnhub" placeholder="Finnhub API Key" />
-              <input type="text" id="api-fmp" placeholder="Financial Modeling Prep (FMP) API Key" />
-              <input type="text" id="api-gnews" placeholder="GNews API Key" />
-              <input type="text" id="api-newsapi" placeholder="NewsAPI Key" />
-              <input type="text" id="api-pexels" placeholder="Pexels API Key" />
-              <input type="text" id="api-unsplash" placeholder="Unsplash API Key" />
-              <input type="text" id="api-reddit" placeholder="Reddit (Optional/Access Token)" />
-            </div>
-            <button id="btn-toggle-apis" class="toggle-btn">Show All Providers ▼</button>
-          </div>
-          <div id="api-status">Awaiting configuration.</div>
-        </div>
-
-        <div style="display: flex; gap: 1rem;">
-          <button id="btn-validate"
-            style="flex:1; background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 8px; cursor: pointer; transition: background 0.2s;">Validate
-            Keys</button>
-          <button id="btn-generate" style="flex:2;">Generate Dashboard</button>
-        </div>
+        <button id="btn-generate" style="margin-top: 1rem;">Generate Dashboard</button>
 
         <div class="director-legend">
           <h3>Director Controls</h3>
@@ -75,53 +45,33 @@
             <li><strong>→ / ←</strong> : Switch Slides</li>
             <li><strong>H / B / C / R</strong> : Highlight / Box / Focus / Reset (Slide only)</li>
             <li><strong>Z</strong> : Toggle Magnifier (Slide only)</li>
-            <li><strong>D</strong> : API Routing Console</li>
+            <li><strong>D</strong> : Debug Overlay</li>
           </ul>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- PAGE INDICATOR -->
   <div id="page-indicator" class="hidden">Slide 1 / 1</div>
 
-  <!-- MAGNIFIER OVERLAY LENS (Now strictly visual) -->
+  <!-- MAGNIFIER OVERLAY LENS -->
   <div id="magnifier-lens" class="hidden"></div>
 
   <!-- DEBUG CONSOLE OVERLAY -->
   <div id="debug-console" class="hidden">
-    <div class="debug-header">Data Router & Fallback Trace <span style="float:right; cursor:pointer;"
+    <div class="debug-header">Debug State <span style="float:right; cursor:pointer;"
         onclick="document.getElementById('debug-console').classList.add('hidden')">X</span></div>
     <div id="debug-logs"></div>
   </div>
 
   <!-- External Libraries -->
-  <!-- External Libraries -->
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js" defer></script>
+  <!-- No lightweight-charts needed, we use iframe -->
 
   <!-- Core Engine -->
-  <script src="js/core/capability.js" defer></script>
-
-  <!-- Providers -->
-  <script src="js/providers/polygon.js" defer></script>
-  <script src="js/providers/alphavantage.js" defer></script>
-  <script src="js/providers/finnhub.js" defer></script>
-  <script src="js/providers/fmp.js" defer></script>
-  <script src="js/providers/gnews.js" defer></script>
-  <script src="js/providers/newsapi.js" defer></script>
-  <script src="js/providers/pexels.js" defer></script>
-  <script src="js/providers/unsplash.js" defer></script>
-  <script src="js/providers/reddit.js" defer></script>
-
-  <!-- Router & Builder -->
-  <script src="js/core/dataRouter.js" defer></script>
-  <script src="js/core/panelBuilder.js" defer></script>
-  <script src="js/core/navigation.js" defer></script>
   <script src="js/core/app.js" defer></script>
-
-  <!-- Visualization -->
-  <script src="js/chart.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+  <script src="js/renderer.js" defer></script>
 
   <!-- Director Tools -->
   <script src="js/tools/magnifier.js" defer></script>

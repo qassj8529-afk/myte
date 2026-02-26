@@ -44,7 +44,7 @@ function updateDebugHeader() {
   }
 
   // Preserve the close button
-  header.innerHTML = `Data Router Trace | Slide: ${slideIdx} | Zoom: ${isZoom} | Director: ${activeTool} 
+  header.innerHTML = `JSON Render State | Slide: ${slideIdx} | Zoom: ${isZoom} | Director: ${activeTool} 
     <span style="float:right; cursor:pointer;" onclick="document.getElementById('debug-console').classList.add('hidden'); isDebugVisible=false;">X</span>`;
 }
 
