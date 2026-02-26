@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Finance Studio Pro - Modular</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+  <!-- Animated Gradient Background -->
+  <div class="bg-gradient"></div>
+
+  <!-- FILE PROTOCOL WARNING BANNER -->
+  <div id="file-protocol-warning" class="hidden banner-error">
+    <strong>WARNING:</strong> Run this project via local server (Live Server or GitHub Pages) to enable API requests.
+  </div>
+
+  <!-- SLIDER WRAPPER -->
+  <div id="slider-wrapper">
+    <!-- SLIDE 1: START SCREEN -->
+    <div class="slide slide-active" id="slide-start">
+      <div class="glass-panel central-panel">
+        <h1>Finance Studio Pro</h1>
+        <p class="subtitle">Provider Agnostic Data Engine</p>
+
+        <textarea id="script-input" placeholder="Paste script here..."></textarea>
+
+        <div class="api-panel">
+          <label>API Configuration (Optional Providers)</label>
+          <div class="api-inputs" id="api-inputs">
+            <input type="text" id="api-polygon" placeholder="Polygon API Key" />
+            <div class="expandable-panel" id="expandable-api-panel">
+              <input type="text" id="api-alphavantage" placeholder="Alpha Vantage API Key" />
+              <input type="text" id="api-finnhub" placeholder="Finnhub API Key" />
+              <input type="text" id="api-fmp" placeholder="Financial Modeling Prep (FMP) API Key" />
+              <input type="text" id="api-gnews" placeholder="GNews API Key" />
+              <input type="text" id="api-newsapi" placeholder="NewsAPI Key" />
+              <input type="text" id="api-pexels" placeholder="Pexels API Key" />
+              <input type="text" id="api-unsplash" placeholder="Unsplash API Key" />
+              <input type="text" id="api-reddit" placeholder="Reddit (Optional/Access Token)" />
+            </div>
+            <button id="btn-toggle-apis" class="toggle-btn">Show All Providers ▼</button>
+          </div>
+          <div id="api-status">Awaiting configuration.</div>
+        </div>
+
+        <button id="btn-generate">Validate Capabilities & Build Dashboard</button>
+
+        <div class="director-legend">
+          <h3>Director Controls</h3>
+          <ul>
+            <li><strong>→ / ←</strong> : Switch Slides</li>
+            <li><strong>Z</strong> : Toggle Magnifier</li>
+            <li><strong>D</strong> : API Routing Console</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PAGE INDICATOR -->
+  <div id="page-indicator" class="hidden">Slide 1 / 1</div>
+
+  <!-- MAGNIFIER OVERLAY -->
+  <div id="magnifier-lens" class="hidden">
+    <div id="magnifier-content"></div>
+  </div>
+
+  <!-- DEBUG CONSOLE OVERLAY -->
+  <div id="debug-console" class="hidden">
+    <div class="debug-header">Data Router & Fallback Trace <span style="float:right; cursor:pointer;"
+        onclick="document.getElementById('debug-console').classList.add('hidden')">X</span></div>
+    <div id="debug-logs"></div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <!-- Core Engine -->
+  <script src="js/debug.js"></script>
+  <script src="js/core/capability.js"></script>
+
+  <!-- Providers -->
+  <script src="js/providers/polygon.js"></script>
+  <script src="js/providers/alphavantage.js"></script>
+  <script src="js/providers/finnhub.js"></script>
+  <script src="js/providers/fmp.js"></script>
+  <script src="js/providers/gnews.js"></script>
+  <script src="js/providers/newsapi.js"></script>
+  <script src="js/providers/pexels.js"></script>
+  <script src="js/providers/unsplash.js"></script>
+  <script src="js/providers/reddit.js"></script>
+
+  <!-- Router & Builder -->
+  <script src="js/core/dataRouter.js"></script>
+  <script src="js/core/panelBuilder.js"></script>
+
+  <!-- Visualization & Tools -->
+  <script src="js/chart.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/magnifier.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>
