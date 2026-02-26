@@ -139,13 +139,32 @@ p {
   /* never scroll */
 }
 
-/* Base wrapper for slide content */
 .slide-content-wrapper {
   width: 100%;
   max-width: 1600px;
   height: 85vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10;
+}
+
+/* OVERLAY LAYER (For Director Tools: Canvas, Highlights, etc) */
+.overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  /* Above content, below navigation/debug */
+  pointer-events: none;
+  /* Let clicks pass through to content unless drawing */
+}
+
+.overlay-layer.draw-mode {
+  pointer-events: auto;
+  cursor: crosshair;
 }
 
 .slide-title {
@@ -407,19 +426,19 @@ button#btn-generate:active {
 /* ==========================================================================
    Magnifier Fix
    ========================================================================== */
-/* Lens is a fixed overlay that uses CSS background pointing to the body for zooming */
+/* Lens is a fixed overlay that uses CSS background pointing to the active slide for zooming */
 #magnifier-lens {
   position: fixed;
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 10px 30px rgba(0, 0, 0, 0.8);
+  border: 4px solid var(--accent-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2);
   pointer-events: none;
   z-index: 10000;
 
-  /* Hard cropping to circle */
-  overflow: hidden;
+  background-color: var(--bg-dark);
+  background-repeat: no-repeat;
 
   /* Initial placement */
   top: 0;
@@ -427,18 +446,12 @@ button#btn-generate:active {
 
   /* GPU Accel */
   transform: translateZ(0);
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
-/* Content inside lens - cloned from body structure by magnifier.js */
-#magnifier-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  /* Transform origin will be updated by JS */
-  transform: scale(2);
-  pointer-events: none;
+#magnifier-lens.hidden {
+  opacity: 0;
 }
 
 /* ==========================================================================
