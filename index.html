@@ -62,7 +62,12 @@
           <div id="api-status">Awaiting configuration.</div>
         </div>
 
-        <button id="btn-generate">Validate Capabilities & Build Dashboard</button>
+        <div style="display: flex; gap: 1rem;">
+          <button id="btn-validate"
+            style="flex:1; background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 8px; cursor: pointer; transition: background 0.2s;">Validate
+            Keys</button>
+          <button id="btn-generate" style="flex:2;">Generate Dashboard</button>
+        </div>
 
         <div class="director-legend">
           <h3>Director Controls</h3>
@@ -92,35 +97,36 @@
   </div>
 
   <!-- External Libraries -->
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js" defer></script>
 
   <!-- Core Engine -->
-  <script src="js/core/capability.js"></script>
+  <script src="js/core/capability.js" defer></script>
 
   <!-- Providers -->
-  <script src="js/providers/polygon.js"></script>
-  <script src="js/providers/alphavantage.js"></script>
-  <script src="js/providers/finnhub.js"></script>
-  <script src="js/providers/fmp.js"></script>
-  <script src="js/providers/gnews.js"></script>
-  <script src="js/providers/newsapi.js"></script>
-  <script src="js/providers/pexels.js"></script>
-  <script src="js/providers/unsplash.js"></script>
-  <script src="js/providers/reddit.js"></script>
+  <script src="js/providers/polygon.js" defer></script>
+  <script src="js/providers/alphavantage.js" defer></script>
+  <script src="js/providers/finnhub.js" defer></script>
+  <script src="js/providers/fmp.js" defer></script>
+  <script src="js/providers/gnews.js" defer></script>
+  <script src="js/providers/newsapi.js" defer></script>
+  <script src="js/providers/pexels.js" defer></script>
+  <script src="js/providers/unsplash.js" defer></script>
+  <script src="js/providers/reddit.js" defer></script>
 
   <!-- Router & Builder -->
-  <script src="js/core/dataRouter.js"></script>
-  <script src="js/core/panelBuilder.js"></script>
-  <script src="js/core/navigation.js"></script>
-  <script src="js/core/app.js"></script>
+  <script src="js/core/dataRouter.js" defer></script>
+  <script src="js/core/panelBuilder.js" defer></script>
+  <script src="js/core/navigation.js" defer></script>
+  <script src="js/core/app.js" defer></script>
 
   <!-- Visualization -->
-  <script src="js/chart.js"></script>
+  <script src="js/chart.js" defer></script>
 
   <!-- Director Tools -->
-  <script src="js/tools/magnifier.js"></script>
-  <script src="js/tools/directorTools.js"></script>
-  <script src="js/tools/debug.js"></script>
+  <script src="js/tools/magnifier.js" defer></script>
+  <script src="js/tools/directorTools.js" defer></script>
+  <script src="js/tools/debug.js" defer></script>
 
 </body>
 
