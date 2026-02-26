@@ -94,3 +94,17 @@ function logDebug(message, type = 'log-info', data = null) {
 // Attach to window so api.js can call it easily without circular deps
 window.logDebug = logDebug;
 window.initDebug = initDebug;
+
+// Global Error Catching
+window.onerror = function (message, source, lineno, colno, error) {
+  if (window.logDebug) {
+    window.logDebug(`Global Error: ${message} (Line ${lineno})`, 'log-error', error ? error.stack : null);
+  }
+  return false; // let default browser console log too
+};
+
+window.onunhandledrejection = function (event) {
+  if (window.logDebug) {
+    window.logDebug(`Unhandled Promise Rejection: ${event.reason}`, 'log-error', event.reason ? event.reason.stack : null);
+  }
+};
