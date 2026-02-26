@@ -34,10 +34,31 @@ function initCapabilities() {
 }
 
 /**
- * Reads DOM inputs and builds the capability object.
+ * Lightweight helper to verify an API key against a fast endpoint.
  */
-function evaluateCapabilities() {
-    // Reset
+async function testEndpoint(provider, url, headers = {}) {
+    try {
+        const res = await fetch(url, { headers, mode: 'cors' });
+        if (res.ok) return { valid: true };
+        if (res.status === 401 || res.status === 403) return { valid: false, error: 'Unauthorized/Invalid Key' };
+        return { valid: false, error: `Error ${res.status}` };
+    } catch (e) {
+        return { valid: false, error: 'Network Error' };
+    }
+}
+
+
+/**
+ * Async validation of all keys before registering capabilities.
+ */
+async function validateCapabilities() {
+    const statusEl = document.getElementById('api-status');
+    if (statusEl) {
+        statusEl.innerText = 'Validating API Keys...';
+        statusEl.style.color = '#93c5fd'; // blue-300
+    }
+
+    // Pure state reset
     Object.keys(AppState.capabilities).forEach(k => AppState.capabilities[k] = false);
     AppState.activeProviders = {};
 
@@ -55,66 +76,134 @@ function evaluateCapabilities() {
 
     AppState.keys = keys;
 
+    const validMap = {};
+    const errorMap = {};
+    const promises = [];
+
     // Evaluate Polygon
     if (keys.polygon) {
-        AppState.activeProviders.polygon = true;
-        AppState.capabilities.priceData = true;
-        AppState.capabilities.news = true;
-        AppState.capabilities.fundamentals = true;
+        promises.push(testEndpoint('polygon', `https://api.polygon.io/v3/reference/tickers?limit=1&apiKey=${keys.polygon}`).then(r => {
+            if (r.valid) {
+                validMap.polygon = true;
+                AppState.capabilities.priceData = true;
+                AppState.capabilities.news = true;
+                AppState.capabilities.fundamentals = true;
+            } else errorMap.polygon = r.error;
+        }));
     }
 
-    // Evaluate Alpha Vantage
+    // Alpha Vantage (often doesn't hard fail 401 on standard endpoints but returns JSON error message, we do a basic ticker search)
     if (keys.alphavantage) {
-        AppState.activeProviders.alphavantage = true;
-        AppState.capabilities.priceData = true;
-        AppState.capabilities.news = true;
+        promises.push(testEndpoint('alphavantage', `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=AAPL&apikey=${keys.alphavantage}`).then(r => {
+            // Assume valid if it didn't throw network error, routing will catch bad responses
+            if (r.valid) {
+                validMap.alphavantage = true;
+                AppState.capabilities.priceData = true;
+                AppState.capabilities.news = true;
+            } else errorMap.alphavantage = r.error;
+        }));
     }
 
-    // Evaluate Finnhub
+    // Finnhub
     if (keys.finnhub) {
-        AppState.activeProviders.finnhub = true;
-        AppState.capabilities.websocket = true;
-        AppState.capabilities.fundamentals = true;
+        promises.push(testEndpoint('finnhub', `https://finnhub.io/api/v1/stock/profile2?symbol=AAPL&token=${keys.finnhub}`).then(r => {
+            if (r.valid) {
+                validMap.finnhub = true;
+                AppState.capabilities.websocket = true;
+                AppState.capabilities.fundamentals = true;
+            } else errorMap.finnhub = r.error;
+        }));
     }
 
-    // Evaluate FMP
+    // FMP
     if (keys.fmp) {
-        AppState.activeProviders.fmp = true;
-        AppState.capabilities.fundamentals = true;
-        AppState.capabilities.insiderData = true;
+        promises.push(testEndpoint('fmp', `https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${keys.fmp}`).then(r => {
+            if (r.valid) {
+                validMap.fmp = true;
+                AppState.capabilities.fundamentals = true;
+                AppState.capabilities.insiderData = true;
+            } else errorMap.fmp = r.error;
+        }));
     }
 
-    // Evaluate Independent News
+    // GNews
     if (keys.gnews) {
-        AppState.activeProviders.gnews = true;
-        AppState.capabilities.news = true;
+        promises.push(testEndpoint('gnews', `https://gnews.io/api/v4/search?q=apple&max=1&apikey=${keys.gnews}`).then(r => {
+            if (r.valid) {
+                validMap.gnews = true;
+                AppState.capabilities.news = true;
+            } else errorMap.gnews = r.error;
+        }));
     }
+
+    // NewsAPI
     if (keys.newsapi) {
-        AppState.activeProviders.newsapi = true;
-        AppState.capabilities.news = true;
+        promises.push(testEndpoint('newsapi', `https://newsapi.org/v2/everything?q=apple&pageSize=1&apiKey=${keys.newsapi}`).then(r => {
+            if (r.valid) {
+                validMap.newsapi = true;
+                AppState.capabilities.news = true;
+            } else errorMap.newsapi = r.error;
+        }));
     }
 
-    // Evaluate Independent Media
+    // Pexels
     if (keys.pexels) {
-        AppState.activeProviders.pexels = true;
-        AppState.capabilities.images = true;
-    }
-    if (keys.unsplash) {
-        AppState.activeProviders.unsplash = true;
-        AppState.capabilities.images = true;
+        promises.push(testEndpoint('pexels', `https://api.pexels.com/v1/search?query=business&per_page=1`, { Authorization: keys.pexels }).then(r => {
+            if (r.valid) {
+                validMap.pexels = true;
+                AppState.capabilities.images = true;
+            } else errorMap.pexels = r.error;
+        }));
     }
 
-    // Evaluate Reddit
-    if (keys.reddit || true) { // Reddit free tier often works without explicit key for basic search
-        AppState.activeProviders.reddit = true;
+    // Unsplash
+    if (keys.unsplash) {
+        promises.push(testEndpoint('unsplash', `https://api.unsplash.com/search/photos?query=business&per_page=1`, { Authorization: `Client-ID ${keys.unsplash}` }).then(r => {
+            if (r.valid) {
+                validMap.unsplash = true;
+                AppState.capabilities.images = true;
+            } else errorMap.unsplash = r.error;
+        }));
+    }
+
+    // Reddit (often works without explicit key)
+    if (keys.reddit || true) {
+        validMap.reddit = true;
         AppState.capabilities.social = true;
     }
 
-    logDebug(`Capabilities Evaluated. Active Domains: ${Object.keys(AppState.capabilities).filter(k => AppState.capabilities[k]).join(', ')}`, 'log-info');
+    // Wait for all tests to resolve (using Promise.allSettled implicitly by awaiting Promise.all of caught promises)
+    await Promise.all(promises);
+
+    AppState.activeProviders = validMap;
+
+    // UI Generation
+    const totalChecked = promises.length + (keys.reddit ? 1 : 0);
+    const activeCount = Object.keys(validMap).length;
+
+    if (statusEl) {
+        if (activeCount === 0 && promises.length > 0) {
+            statusEl.innerText = `Validation Failed. All ${promises.length} keys invalid.`;
+            statusEl.style.color = '#ef4444'; // red-500
+        } else if (activeCount > 0) {
+            statusEl.innerText = `Success. ${activeCount} providers active.`;
+            statusEl.style.color = '#4ade80'; // green-400
+
+            const errors = Object.keys(errorMap).map(k => `${k}: ${errorMap[k]}`).join(' | ');
+            if (errors) {
+                statusEl.innerText += ` (Failed: ${errors})`;
+            }
+        } else {
+            statusEl.innerText = 'Awaiting configuration (Keys Optional for Mock/Reddit)';
+            statusEl.style.color = '#fde047'; // yellow-300
+        }
+    }
+
+    if (window.logDebug) window.logDebug(`Validation complete. Active providers: ${Object.keys(validMap).join(', ')}`, 'log-info');
     return AppState.capabilities;
 }
 
-// Make accessible to other core modules
+// Make accessible
 window.AppState = AppState;
 window.initCapabilities = initCapabilities;
-window.evaluateCapabilities = evaluateCapabilities;
+window.validateCapabilities = validateCapabilities;
