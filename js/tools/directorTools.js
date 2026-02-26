@@ -99,14 +99,14 @@ function startDraw(e) {
     if (activeMode === 'H') {
         currentElement = document.createElement('div');
         currentElement.style.position = 'absolute';
-        currentElement.style.background = 'rgba(234, 179, 8, 0.4)'; // yellow-500 tint
+        currentElement.style.background = 'rgba(59, 130, 246, 0.2)'; // blue translucent for light theme
         currentElement.style.borderRadius = '4px';
         currentElement.style.pointerEvents = 'none'; // so you can draw over it
 
     } else if (activeMode === 'B') {
         currentElement = document.createElement('div');
         currentElement.style.position = 'absolute';
-        currentElement.style.border = '3px solid #ef4444'; // red-500
+        currentElement.style.border = '4px solid #1e40af'; // deep outline
         currentElement.style.background = 'transparent';
         currentElement.style.borderRadius = '8px';
         currentElement.style.pointerEvents = 'none';
@@ -115,9 +115,9 @@ function startDraw(e) {
         // Focus implies drawing a dark circle or highlight. We'll do a spotlight pulse ring.
         currentElement = document.createElement('div');
         currentElement.style.position = 'absolute';
-        currentElement.style.border = '4px solid #3b82f6'; // blue-500
+        currentElement.style.border = '5px solid #d946ef'; // fuchsia ring
         currentElement.style.borderRadius = '50%';
-        currentElement.style.background = 'rgba(59, 130, 246, 0.1)';
+        currentElement.style.background = 'rgba(217, 70, 239, 0.1)';
         currentElement.style.pointerEvents = 'none';
     }
 

@@ -80,19 +80,28 @@ function activateMagnifier() {
     // and translate it exactly opposite to the mouse pointer.
 
     lensEl.innerHTML = '';
-    const clone = activeSlideEl.cloneNode(true);
-    clone.id = ''; // clear dupes
-    clone.style.position = 'absolute';
-    clone.style.top = '0';
-    clone.style.left = '0';
-    clone.style.width = `${activeSlideRect.width}px`;
-    clone.style.height = `${activeSlideRect.height}px`;
 
-    // Clean overlay layer from clone so it doesn't dupe highlight lines
-    const cloneOverlay = clone.querySelector('.overlay-layer');
-    if (cloneOverlay) cloneOverlay.remove();
+    let clone;
+    try {
+        clone = activeSlideEl.cloneNode(true);
+        clone.id = ''; // clear dupes
+        clone.style.position = 'absolute';
+        clone.style.top = '0';
+        clone.style.left = '0';
+        clone.style.width = `${activeSlideRect.width}px`;
+        clone.style.height = `${activeSlideRect.height}px`;
 
-    lensEl.appendChild(clone);
+        // Clean overlay layer from clone so it doesn't dupe highlight lines
+        const cloneOverlay = clone.querySelector('.overlay-layer');
+        if (cloneOverlay) cloneOverlay.remove();
+
+        lensEl.appendChild(clone);
+    } catch (e) {
+        // Cross-origin iframe (e.g. TradingView) might throw SecurityError on clone
+        if (window.logDebug) window.logDebug(`Magnifier clone restricted by cross-origin iframe. Falling back to blank lens.`, 'log-warn');
+        lensEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        lensEl.style.backdropFilter = 'blur(4px)'; // at least give it a glass effect if cloning fails
+    }
 
     // Bind specific listener
     activeSlideEl.addEventListener('mousemove', handlePointerMove);
