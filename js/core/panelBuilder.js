@@ -1,10 +1,12 @@
 /**
  * panelBuilder.js
- * Generates specific slides ONLY if their capability exists.
+ * Generates specific slides ONLY if their capability exists AND they are specifically requested in the JSON Blueprint array.
  */
 
-window.buildPanels = async function (scriptText, ticker) {
+window.buildPanels = async function (blueprint) {
     const wrapper = document.getElementById('slider-wrapper');
+    const panelsReq = blueprint.dashboardPanelsRequired;
+    const ticker = blueprint.ticker;
 
     // Clear old slides
     const existingSlides = document.querySelectorAll('.slide');
@@ -14,8 +16,8 @@ window.buildPanels = async function (scriptText, ticker) {
 
     let slideCount = 1;
 
-    // Render Charts if Price Data available
-    if (AppState.capabilities.priceData) {
+    // Render Charts
+    if (panelsReq.includes('chart') && AppState.capabilities.priceData) {
         const slide = await spawnPanel(ticker, 'Price Action', async (container) => {
             const chartWrapper = document.createElement('div');
             chartWrapper.className = 'chart-fullscreen-container';
@@ -26,23 +28,18 @@ window.buildPanels = async function (scriptText, ticker) {
                 if (window.renderTVChart) window.renderTVChart(chartWrapper, res.data);
                 return true;
             }
-            return false; // Did not render
+            return false;
         });
         if (slide) { wrapper.appendChild(slide); slideCount++; }
-    } else {
-        logDebug("Skipped Chart panel: 'priceData' capability missing.", 'log-warn');
     }
 
-    // Render Fundamentals (Metrics)
-    if (AppState.capabilities.fundamentals) {
+    // Render Key Metrics
+    if (panelsReq.includes('key_metrics') && AppState.capabilities.fundamentals) {
         const slide = await spawnPanel(ticker, 'Key Metrics', async (container) => {
             const res = await routeDataRequest('fundamentals', ticker);
             if (res && res.data) {
                 const grid = document.createElement('div');
                 grid.className = 'metrics-grid';
-
-                // Generic renderer since structure might vary per provider
-                // Assuming provider normalizes to [{label: 'Market Cap', value: '3T'}, ...]
                 res.data.forEach(m => {
                     const card = document.createElement('div');
                     card.className = 'metric-card glass-panel';
@@ -57,27 +54,19 @@ window.buildPanels = async function (scriptText, ticker) {
         if (slide) { wrapper.appendChild(slide); slideCount++; }
     }
 
-    // Render News
-    if (AppState.capabilities.news) {
-        const slide = await spawnPanel(ticker, 'Recent Headlines', async (container) => {
-            const res = await routeDataRequest('news', ticker);
+    // Render Fundamentals (Detailed)
+    if (panelsReq.includes('fundamentals') && AppState.capabilities.fundamentals) {
+        const slide = await spawnPanel(ticker, 'Fundamentals Deep Dive', async (container) => {
+            const res = await routeDataRequest('fundamentals', ticker);
+            // If FMP provides more detailed objects, this would map them. 
+            // For now, re-using metrics display safely if data exists.
             if (res && res.data) {
                 const grid = document.createElement('div');
-                grid.className = 'news-grid';
-
-                // Normalized expected: [{url, img, source, date, title}]
-                res.data.forEach(item => {
-                    const card = document.createElement('a');
-                    card.className = 'news-card';
-                    card.href = item.url || '#';
-                    card.target = '_blank';
-                    card.innerHTML = `
-            <img src="${item.img || 'https://via.placeholder.com/350x180?text=No+Image'}" class="news-thumb" alt="News">
-            <div class="news-content">
-              <div class="news-meta">${item.source || 'Unknown'} | ${item.date || ''}</div>
-              <div class="news-title">${item.title}</div>
-            </div>
-          `;
+                grid.className = 'metrics-grid';
+                res.data.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'metric-card glass-panel';
+                    card.innerHTML = `<div class="label">${m.label}</div><div class="value">${m.value}</div>`;
                     grid.appendChild(card);
                 });
                 container.appendChild(grid);
@@ -88,8 +77,27 @@ window.buildPanels = async function (scriptText, ticker) {
         if (slide) { wrapper.appendChild(slide); slideCount++; }
     }
 
-    // Render Social
-    if (AppState.capabilities.social) {
+    // Render Earnings (Needs endpoint modification, using blueprint logic securely)
+    if (panelsReq.includes('earnings')) {
+        const slide = await spawnPanel(ticker, 'Earnings Review', async (container) => {
+            // Feature placeholder to match blueprint reqs 
+            container.innerHTML = `<div class="message-panel">Earnings Data unavailable from active providers.</div>`;
+            return true; // We render the panel as "requested but unavailable" for now given current API abstractions
+        });
+        if (slide) { wrapper.appendChild(slide); slideCount++; }
+    }
+
+    // Render Short Interest 
+    if (panelsReq.includes('short_interest')) {
+        const slide = await spawnPanel(ticker, 'Short Interest & Sentiment', async (container) => {
+            container.innerHTML = `<div class="message-panel">Short Interest Data unavailable from active providers.</div>`;
+            return true;
+        });
+        if (slide) { wrapper.appendChild(slide); slideCount++; }
+    }
+
+    // Render Social Sentiment
+    if (panelsReq.includes('social_sentiment') && AppState.capabilities.social) {
         const slide = await spawnPanel(ticker, 'Social Sentiment', async (container) => {
             const res = await routeDataRequest('social', ticker);
             if (res && res.data) {
@@ -114,11 +122,35 @@ window.buildPanels = async function (scriptText, ticker) {
         if (slide) { wrapper.appendChild(slide); slideCount++; }
     }
 
-    // Render Images
-    if (AppState.capabilities.images) {
+    // Render Risk Scenarios (Driven explicitly by Blueprint text)
+    if (panelsReq.includes('risk_scenarios') && blueprint.riskScenarios) {
+        const slide = await spawnPanel(ticker, 'Risk Scenarios', async (container) => {
+            const bull = blueprint.riskScenarios.bullCase || "No bull case listed.";
+            const bear = blueprint.riskScenarios.bearCase || "No bear case listed.";
+
+            container.innerHTML = `
+          <div style="display:flex; gap: 2rem; width:100%; height:100%;">
+             <div class="glass-panel" style="flex:1; padding: 2rem; border-top: 4px solid #4ade80;">
+                <h3 style="color:#4ade80; margin-bottom: 1rem;">Bull Case</h3>
+                <p>${bull}</p>
+             </div>
+             <div class="glass-panel" style="flex:1; padding: 2rem; border-top: 4px solid #ef4444;">
+                <h3 style="color:#ef4444; margin-bottom: 1rem;">Bear Case</h3>
+                <p>${bear}</p>
+             </div>
+          </div>
+        `;
+            return true;
+        });
+        if (slide) { wrapper.appendChild(slide); slideCount++; }
+    }
+
+
+    // Render Industry Context (Media)
+    if (panelsReq.includes('industry_context') && AppState.capabilities.images) {
         const slide = await spawnPanel(ticker, 'Industry Context', async (container) => {
-            const query = ticker + " corporate finance";
-            const res = await routeDataRequest('images', ticker, query); // ticker unused here essentially
+            const query = blueprint.companyName ? blueprint.companyName + " industry" : ticker + " industry";
+            const res = await routeDataRequest('images', ticker, query);
             if (res && res.data) {
                 const grid = document.createElement('div');
                 grid.className = 'images-flow';
@@ -140,7 +172,7 @@ window.buildPanels = async function (scriptText, ticker) {
 }
 
 /**
- * Creates a generic full-screen slide if the renderer succeeds.
+ * Creates a generic full-screen slide with `.overlay-layer` built in.
  */
 async function spawnPanel(ticker, titleString, rendererFn) {
     const slide = document.createElement('div');
@@ -157,18 +189,27 @@ async function spawnPanel(ticker, titleString, rendererFn) {
     const container = document.createElement('div');
     container.className = 'panel-container';
     wrapper.appendChild(container);
+
+    // CRITICAL: The overlay layer for director tools to draw upon
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay-layer';
+
     slide.appendChild(wrapper);
+    slide.appendChild(overlay);
 
     try {
         const success = await rendererFn(container);
         if (success) {
             return slide;
         } else {
-            // Per prompt instructions: Do not render panel if no provider data
-            return null;
+            // If a capability was true but the API request failed deeply, show failsafe message.
+            container.innerHTML = `<div class="message-panel">Data unavailable from active providers.</div>`;
+            return slide; // Still return the slide so the user knows an attempt was made and failed.
         }
     } catch (e) {
         if (window.logDebug) window.logDebug(`Panel Build Error for ${titleString}: ` + e.message, 'log-error');
-        return null;
+        // Failsafe per instructions
+        container.innerHTML = `<div class="message-panel">Data unavailable from active providers.</div>`;
+        return slide;
     }
 }
